@@ -1,32 +1,45 @@
-package service;
+package service.task;
 
 import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.Task;
+import service.history.HistoryService;
 
 import java.util.*;
 
-public class TaskService {
-    HashMap<Integer, Task> tasks = new HashMap<>();
-    HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HashMap<Integer, Epic> epics = new HashMap<>();
+public class InMemoryTaskService implements TaskService {
+    Map<Integer, Task> tasks = new HashMap<>();
+    Map<Integer, SubTask> subTasks = new HashMap<>();
+    Map<Integer, Epic> epics = new HashMap<>();
+    private final HistoryService historyService;
     int id;
 
+    public InMemoryTaskService(HistoryService historyService) {
+        this.historyService = historyService;
+    }
+
+    public List<Task> getHistory(){
+        return historyService.getHistory();
+    }
+
+    @Override
     public Task createTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
-        return task;
+        return new Task(task);
     }
 
+    @Override
     public Epic createEpic(Epic epic) {
         epic.setId(generateId());
         epic.setSubTaskIds(new ArrayList<>());
         epic.setStatus(Status.NEW);
         epics.put(epic.getId(), epic);
-        return epic;
+        return new Epic(epic);
     }
 
+    @Override
     public SubTask createSubTask(SubTask subTask) {
         Epic epic = epics.get(subTask.getEpicId());
         if (Objects.isNull(epic)) {
@@ -35,10 +48,11 @@ public class TaskService {
         subTask.setId(generateId());
         epic.addSubTaskId(subTask.getId());
         subTasks.put(subTask.getId(), subTask);
-        recalcEpicStatus(epic.getId());
+        recalculateEpicStatus(epic.getId());
         return new SubTask(subTask);
     }
 
+    @Override
     public Task updateTask(Task task) {
         Task saved = getTask(task.getId());
         if (Objects.isNull(saved)) {
@@ -51,6 +65,7 @@ public class TaskService {
         return saved;
     }
 
+    @Override
     public Epic updateEpic(Epic epic) {
         Epic saved = getEpic(epic.getId());
         if (Objects.isNull(saved)) {
@@ -62,6 +77,7 @@ public class TaskService {
         return saved;
     }
 
+    @Override
     public SubTask updateSubTask(SubTask subTask) {
         SubTask saved = getSubTask(subTask.getId());
         if (Objects.isNull(saved)) {
@@ -74,8 +90,8 @@ public class TaskService {
                 int oldEpicId = saved.getEpicId();
                 saved.setEpicId(subTask.getEpicId());
                 subTasks.put(saved.getId(), saved);
-                recalcEpicStatus(oldEpicId);
-                recalcEpicStatus(saved.getEpicId());
+                recalculateEpicStatus(oldEpicId);
+                recalculateEpicStatus(saved.getEpicId());
             }
         } else {
             saved.setStatus(subTask.getStatus());
@@ -84,39 +100,62 @@ public class TaskService {
                 saved.setEpicId(subTask.getEpicId());
                 getEpic(oldEpicId).getSubTaskIds().remove(saved.getId());
                 getEpic(saved.getEpicId()).getSubTaskIds().add(saved.getId());
-                recalcEpicStatus(oldEpicId);
-                recalcEpicStatus(saved.getEpicId());
+                recalculateEpicStatus(oldEpicId);
+                recalculateEpicStatus(saved.getEpicId());
             }
             subTasks.put(saved.getId(), saved);
-            recalcEpicStatus(saved.getEpicId());
+            recalculateEpicStatus(saved.getEpicId());
         }
         return saved;
     }
 
+    @Override
     public Task getTask(int id) {
         Task immutableTask = tasks.get(id);
         if (Objects.isNull(immutableTask)) return null;
+        historyService.add(new Task(immutableTask));
         return new Task(immutableTask);
     }
 
-    public List <SubTask> getSubTaskList() {
+    @Override
+    public SubTask getSubTask(int id) {
+        SubTask immutableSubTask = subTasks.get(id);
+        if (Objects.isNull(immutableSubTask)) return null;
+        historyService.add(new SubTask(immutableSubTask));
+        return new SubTask(immutableSubTask);
+    }
+
+    @Override
+    public Epic getEpic(int id) {
+        Epic immutableEpic = epics.get(id);
+        if (Objects.isNull(immutableEpic)) return null;
+        historyService.add(new Epic(immutableEpic));
+        return new Epic(immutableEpic);
+    }
+
+    @Override
+    public List<SubTask> getSubTaskList() {
         return subTasks.values().stream().toList();
     }
 
+    @Override
     public List<Epic> getEpicList() {
         return epics.values().stream().toList();
     }
 
+    @Override
     public List<Task> getTaskList() {
         return tasks.values().stream().toList();
     }
 
+    @Override
     public List<SubTask> getSubTasksForEpic(Epic epic) {
         if (Objects.isNull(epic)) return null;
         if (epic.getSubTaskIds().isEmpty()) return Collections.emptyList();
         return getSubTasksByIds(epic.getSubTaskIds());
     }
 
+    @Override
     public boolean dropTask(int taskId) {
         if (tasks.containsKey(taskId)) {
             tasks.remove(taskId);
@@ -126,12 +165,13 @@ public class TaskService {
         }
     }
 
+    @Override
     public boolean dropSubTask(int subTaskId) {
         if (subTasks.containsKey(subTaskId)) {
             SubTask subTask = getSubTask(subTaskId);
             Epic epic = getEpic(subTask.getEpicId());
             epic.removeSubTask(subTask.getId());
-            recalcEpicStatus(epic.getId());
+            recalculateEpicStatus(epic.getId());
             subTasks.remove(subTaskId);
             return true;
         } else {
@@ -139,6 +179,7 @@ public class TaskService {
         }
     }
 
+    @Override
     public boolean dropEpic(int epicId) {
         if (epics.containsKey(epicId)) {
             Epic epic = getEpic(epicId);
@@ -152,23 +193,11 @@ public class TaskService {
         return false;
     }
 
-    public SubTask getSubTask(int id) {
-        SubTask immutableSubTask = subTasks.get(id);
-        if (Objects.isNull(immutableSubTask)) return null;
-        return new SubTask(immutableSubTask);
-    }
-
-    public Epic getEpic(int id) {
-        Epic immutableEpic = epics.get(id);
-        if (Objects.isNull(immutableEpic)) return null;
-        return new Epic(immutableEpic);
-    }
-
     private int generateId() {
         return ++id;
     }
 
-    private void recalcEpicStatus(int epicId) {
+    private void recalculateEpicStatus(int epicId) {
         Epic epic = epics.get(epicId);
         if (Objects.isNull(epic)) {
             return;

@@ -2,14 +2,15 @@ import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.Task;
-import service.TaskService;
+import service.Managers;
+import service.task.TaskService;
 
 import java.util.Objects;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskService taskService = new TaskService();
+        TaskService taskService = Managers.getDefaults();
         Epic epic = new Epic("Тестовый эпик 1", "Добавим в него много задач, потом удалим эпик", Status.DONE);
         Epic epic1 = new Epic("Тестовый эпик 2", "Удалим пустой эпик", Status.NEW);
         Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null);
@@ -49,7 +50,7 @@ public class Main {
             System.out.println(returnedTask);
         }
 
-        Epic returnedEpic = null;
+        Epic returnedEpic;
         SubTask subTask = new SubTask("подтаска для первого эпика", "закрываем", Status.DONE, 1);
 
         System.out.println("Создаём сабтаск");
@@ -132,7 +133,7 @@ public class Main {
             System.out.println(epic3);
         }
 
-        System.out.println("Удаляем эпик, проверяем, что сабтаски ттоже удалены: ");
+        System.out.println("Удаляем эпик, проверяем, что сабтаски тоже удалены: ");
         taskService.dropEpic(returnedEpic.getId());
         for (SubTask subTaskFromList : taskService.getSubTaskList()){
             System.out.println(subTaskFromList);

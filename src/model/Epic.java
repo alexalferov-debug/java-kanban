@@ -31,8 +31,6 @@ public class Epic extends Task {
         subTaskIds.removeIf(id -> id == subTaskId);
     }
 
-
-
     @Override
     public String toString() {
         return "Epic{\n" +

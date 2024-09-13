@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface HistoryService {
 
-    public void add(Task task);
-    public List<Task> getHistory();
+    void add(Task task);
+    List<Task> getHistory();
 }

@@ -8,7 +8,6 @@ import model.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.task.TaskService;
 
 class InMemoryHistoryServiceTest {
     HistoryService historyService;
@@ -36,7 +35,7 @@ class InMemoryHistoryServiceTest {
     public void shouldSaveCurrentStateOfTask(){
         historyService.add(task);
         task.setStatus(Status.DONE);
-        Assertions.assertNotEquals(historyService.getHistory().get(0).getStatus(),task.getStatus());
+        Assertions.assertNotEquals(historyService.getHistory().getFirst().getStatus(),task.getStatus());
     }
 
     @Test

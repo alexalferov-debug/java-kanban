@@ -7,10 +7,11 @@ import java.util.List;
 
 public class InMemoryHistoryService implements HistoryService {
     List<Task> history = new LinkedList<>();
+    private static final int MAX_SIZE = 10;
 
     @Override
     public void add(Task task) {
-        if (history.size() == 10){
+        if (history.size() == MAX_SIZE){
             history.removeFirst();
         }
         history.add(new Task(task));

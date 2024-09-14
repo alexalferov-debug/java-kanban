@@ -6,7 +6,6 @@ import model.Task;
 import org.junit.jupiter.api.Assertions;
 
 public class AssertHelpers{
-
     public static void equalsForTasks(Task expected, Task actual){
         Assertions.assertEquals(expected.getId(),actual.getId(),"Статусы совпадают");
         Assertions.assertEquals(expected.getTitle(),actual.getTitle(),"Заголовки совпадают");

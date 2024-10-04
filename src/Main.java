@@ -107,7 +107,7 @@ public class Main {
         SubTask returnedSubTask9 = taskService.createSubTask(subTask9);
         SubTask returnedSubTask11 = taskService.createSubTask(subTask11);
         System.out.println("Получим и распечатаем список всех сабтасков, входящих в эпик: ");
-        for (SubTask subTaskFromEpic1 : taskService.getSubTasksForEpic(returnedEpic)){
+        for (SubTask subTaskFromEpic1 : taskService.getSubTasksForEpic(returnedEpic)) {
             System.out.println(subTaskFromEpic1);
         }
 
@@ -133,13 +133,13 @@ public class Main {
         }
 
         System.out.println("Список эпиков: ");
-        for (Epic epic3 : taskService.getEpicList()){
+        for (Epic epic3 : taskService.getEpicList()) {
             System.out.println(epic3);
         }
 
         System.out.println("Удаляем эпик, проверяем, что сабтаски тоже удалены: ");
         taskService.dropEpic(returnedEpic.getId());
-        for (SubTask subTaskFromList : taskService.getSubTaskList()){
+        for (SubTask subTaskFromList : taskService.getSubTaskList()) {
             System.out.println(subTaskFromList);
         }
 

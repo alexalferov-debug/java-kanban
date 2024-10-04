@@ -19,7 +19,7 @@ public class InMemoryTaskService implements TaskService {
         this.historyService = historyService;
     }
 
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return historyService.getHistory();
     }
 

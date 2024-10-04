@@ -25,25 +25,25 @@ class InMemoryHistoryServiceTest {
         historyService = new InMemoryHistoryService();
         task = new Task("Таск для добавления", "Просто добавим его в разные списки", Status.NEW);
         epic = new Epic("Таск для добавления", "Просто добавим его в разные списки", Status.NEW);
-        subTask = new SubTask("Лорем ипсум","и выпей чаю",Status.NEW,1);
+        subTask = new SubTask("Лорем ипсум", "и выпей чаю", Status.NEW, 1);
     }
 
     @Test
-    public void shouldAddAllTypesExtendsTasks(){
+    public void shouldAddAllTypesExtendsTasks() {
         task.setId(2);
         epic.setId(1);
         subTask.setId(3);
         historyService.add(task);
         historyService.add(epic);
         historyService.add(subTask);
-        assertEquals(3,historyService.getHistory().size());
+        assertEquals(3, historyService.getHistory().size());
     }
 
     @Test
-    public void shouldSaveCurrentStateOfTask(){
+    public void shouldSaveCurrentStateOfTask() {
         historyService.add(task);
         task.setStatus(Status.DONE);
-        Assertions.assertNotEquals(historyService.getHistory().getFirst().getStatus(),task.getStatus());
+        Assertions.assertNotEquals(historyService.getHistory().getFirst().getStatus(), task.getStatus());
     }
 
     @Test

@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface TaskService {
     List<Task> getHistory();
+
     Task createTask(Task task);
 
     Epic createEpic(Epic epic);

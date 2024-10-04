@@ -5,6 +5,7 @@ import model.Task;
 import service.Managers;
 import service.task.TaskService;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Main {
@@ -91,6 +92,7 @@ public class Main {
         } else {
             System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть DONE");
         }
+        List<Task> getAnotherHistory = taskService.getHistory();
 
         Epic returnedEpic3 = taskService.createEpic(epic1);
         SubTask subTask11 = new SubTask("подтаска для последнего эпика", "поиграем со статусами", Status.IN_WORK, returnedEpic3.getId());
@@ -114,6 +116,8 @@ public class Main {
         } else {
             System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть DONE");
         }
+
+        List<Task> getHistory = taskService.getHistory();
 
         returnedSubTask7.setStatus(Status.NEW);
         returnedSubTask9.setStatus(Status.NEW);

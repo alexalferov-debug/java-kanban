@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class InMemoryHistoryServiceTest {
     HistoryService historyService;
     Task task;
@@ -25,10 +30,13 @@ class InMemoryHistoryServiceTest {
 
     @Test
     public void shouldAddAllTypesExtendsTasks(){
+        task.setId(2);
+        epic.setId(1);
+        subTask.setId(3);
         historyService.add(task);
         historyService.add(epic);
         historyService.add(subTask);
-        Assertions.assertEquals(3,historyService.getHistory().size());
+        assertEquals(3,historyService.getHistory().size());
     }
 
     @Test
@@ -39,32 +47,43 @@ class InMemoryHistoryServiceTest {
     }
 
     @Test
-    public void shouldClearOldElementsIfListSizeAbove9Elements(){
-        SubTask anotherSubtask = new SubTask("Проверим, что этот затёрли","потому что переполнение",Status.IN_WORK,23);
-        anotherSubtask.setId(11);
-        historyService.add(anotherSubtask);
-        for (int i = 0; i <= 9; i = i+2){
-            historyService.add(task);
-            historyService.add(epic);
-        }
+    public void testReplaceTaskInHistory() {
+        task.setId(1);
+        Task task2 = task;
         historyService.add(task);
-        Assertions.assertNotEquals(anotherSubtask.getId(),historyService.getHistory().getFirst().getId());
-        Assertions.assertNotEquals(anotherSubtask.getTitle(),historyService.getHistory().getFirst().getTitle());
-        Assertions.assertNotEquals(anotherSubtask.getDescription(),historyService.getHistory().getFirst().getDescription());
-        Assertions.assertNotEquals(anotherSubtask.getStatus(),historyService.getHistory().getFirst().getStatus());
+        historyService.add(task2);
+
+        List<Task> history = historyService.getHistory();
+        assertEquals(1, history.size());
+        AssertHelpers.equalsForTasks(task2, history.getFirst());
     }
 
     @Test
-    public void shouldAddNewElementsInEndOfList(){
-        SubTask anotherSubtask = new SubTask("Проверим, что этот затёрли","потому что переполнение",Status.IN_WORK,23);
-        anotherSubtask.setId(11);
-        for (int i = 0; i <= 9; i = i+2){
-            historyService.add(task);
-            historyService.add(epic);
-        }
-        System.out.println(historyService.getHistory().size());
+    public void testRemoveTask() {
+        task.setId(1);
+        Task task2 = task;
+        task2.setId(3);
         historyService.add(task);
-        historyService.add(anotherSubtask);
-        AssertHelpers.equalsForTasks(anotherSubtask,historyService.getHistory().get(9));
+        historyService.add(task2);
+        historyService.remove(1);
+        List<Task> history = historyService.getHistory();
+        assertEquals(1, history.size());
+        AssertHelpers.equalsForTasks(task2, history.getFirst());
+    }
+
+    @Test
+    public void testRemoveNonExistentTask() {
+        historyService.add(task);
+
+        historyService.remove(2);
+        List<Task> history = historyService.getHistory();
+        assertEquals(1, history.size());
+        AssertHelpers.equalsForTasks(task, history.getFirst());
+    }
+
+    @Test
+    public void testGetEmptyHistory() {
+        List<Task> history = historyService.getHistory();
+        assertTrue(history.isEmpty());
     }
 }

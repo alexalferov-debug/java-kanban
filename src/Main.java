@@ -5,6 +5,7 @@ import model.Task;
 import service.Managers;
 import service.task.TaskService;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Main {
@@ -91,6 +92,7 @@ public class Main {
         } else {
             System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть DONE");
         }
+        List<Task> getAnotherHistory = taskService.getHistory();
 
         Epic returnedEpic3 = taskService.createEpic(epic1);
         SubTask subTask11 = new SubTask("подтаска для последнего эпика", "поиграем со статусами", Status.IN_WORK, returnedEpic3.getId());
@@ -105,7 +107,7 @@ public class Main {
         SubTask returnedSubTask9 = taskService.createSubTask(subTask9);
         SubTask returnedSubTask11 = taskService.createSubTask(subTask11);
         System.out.println("Получим и распечатаем список всех сабтасков, входящих в эпик: ");
-        for (SubTask subTaskFromEpic1 : taskService.getSubTasksForEpic(returnedEpic)){
+        for (SubTask subTaskFromEpic1 : taskService.getSubTasksForEpic(returnedEpic)) {
             System.out.println(subTaskFromEpic1);
         }
 
@@ -114,6 +116,8 @@ public class Main {
         } else {
             System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть DONE");
         }
+
+        List<Task> getHistory = taskService.getHistory();
 
         returnedSubTask7.setStatus(Status.NEW);
         returnedSubTask9.setStatus(Status.NEW);
@@ -129,13 +133,13 @@ public class Main {
         }
 
         System.out.println("Список эпиков: ");
-        for (Epic epic3 : taskService.getEpicList()){
+        for (Epic epic3 : taskService.getEpicList()) {
             System.out.println(epic3);
         }
 
         System.out.println("Удаляем эпик, проверяем, что сабтаски тоже удалены: ");
         taskService.dropEpic(returnedEpic.getId());
-        for (SubTask subTaskFromList : taskService.getSubTaskList()){
+        for (SubTask subTaskFromList : taskService.getSubTaskList()) {
             System.out.println(subTaskFromList);
         }
 

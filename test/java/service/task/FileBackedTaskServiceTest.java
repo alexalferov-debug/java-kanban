@@ -16,56 +16,11 @@ import java.util.List;
 class FileBackedTaskServiceTest {
 
     private TaskService service;
-    static File file, emptyFile;
+    static File emptyFile;
     Epic epic1 = new Epic("Тестовый эпик 2", "Не будем удалять пустой эпик, поиграемся со статусами", Status.NEW);
     SubTask subTask3 = new SubTask("Добавим в эпик, чтоб не грустил", "Щас в тесты сохраню предзаолненный файл", Status.NEW, 5);
     Task task2 = new Task("второй таск для тестов", "сразу закроем, потом переоткроем", Status.DONE);
     Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null);
-
-
-    @BeforeAll
-    public static void setup() {
-        URL resourceUrl = FileBackedTaskServiceTest.class.getClassLoader().getResource("myTasks.csv");
-        if (resourceUrl == null) {
-            throw new IllegalArgumentException("Ресурс не найден: myTasks.csv");
-        }
-
-        File tempFile = null;
-
-        try {
-            // Создаем временный файл
-            tempFile = File.createTempFile("temp_", ".csv");
-            tempFile.deleteOnExit(); // Удаление файла при завершении программы
-
-            // Копируем содержимое из InputStream в временный файл
-            try (InputStream inputStream = resourceUrl.openStream();
-                 OutputStream outputStream = new FileOutputStream(tempFile)) {
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Ошибка ввода-вывода: " + e.getMessage());
-            e.printStackTrace(); // Печать стека вызовов для отладки
-            // Можно также выбросить своё собственное исключение, если требуется
-        } catch (SecurityException e) {
-            System.err.println("Недостаточно прав для создания файла: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Произошла неизвестная ошибка: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        // Если tempFile по-прежнему null, это указывает на ошибку
-        if (tempFile == null) {
-            throw new RuntimeException("Не удалось создать временный файл.");
-        }
-        file = tempFile;
-    }
 
     @AfterEach
     public void tearDownWriteTests() {
@@ -84,24 +39,28 @@ class FileBackedTaskServiceTest {
 
     @Test
     public void checkTasksFromFile() {
-        service = Managers.getFileService(Path.of(file.toURI()),true);
-        task2.setId(2);
-        AssertHelpers.equalsForTasks(task2, service.getTask(task2.getId()));
+        service = Managers.getFileService(emptyFile.toPath(),false);
+        Task createdTask = service.createTask(task2);
+        TaskService service1 = Managers.getFileService(Path.of(emptyFile.toURI()),true);
+        AssertHelpers.equalsForTasks(service1.getTask(createdTask.getId()), service.getTask(createdTask.getId()));
     }
 
     @Test
     public void checkReadEpicsFromFile() {
-        service = Managers.getFileService(Path.of(file.toURI()),true);
-        epic1.setId(5);
-        epic1.setSubTaskIds(List.of(13));
-        AssertHelpers.equalsForEpics(epic1, service.getEpic(epic1.getId()));
+        service = Managers.getFileService(emptyFile.toPath(),false);
+        Epic createdTask = service.createEpic(epic1);
+        TaskService service1 = Managers.getFileService(Path.of(emptyFile.toURI()),true);
+        AssertHelpers.equalsForTasks(service1.getEpic(createdTask.getId()), service.getEpic(createdTask.getId()));
     }
 
     @Test
     public void checkReadSubtasksFromFile() {
-        service = Managers.getFileService(Path.of(file.toURI()),true);
-        subTask3.setId(13);
-        AssertHelpers.equalsForSubTasks(subTask3, service.getSubTask(subTask3.getId()));
+        service = Managers.getFileService(emptyFile.toPath(),false);
+        Epic createdEpic = service.createEpic(epic1);
+        subTask3.setEpicId(createdEpic.getId());
+        SubTask createdTask = service.createSubTask(subTask3);
+        TaskService service1 = Managers.getFileService(Path.of(emptyFile.toURI()),true);
+        AssertHelpers.equalsForTasks(service1.getSubTask(createdTask.getId()), service.getSubTask(createdTask.getId()));
     }
 
     @Test

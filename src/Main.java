@@ -5,13 +5,16 @@ import model.Task;
 import service.Managers;
 import service.task.TaskService;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskService taskService = Managers.getDefaults();
+        Path path = Paths.get(System.getProperty("user.home"), "tasks", "myTasks.csv");
+        TaskService taskService = Managers.getFileService(path,false);
         Epic epic = new Epic("Тестовый эпик 1", "Добавим в него много задач, потом удалим эпик", Status.DONE);
         Epic epic1 = new Epic("Тестовый эпик 2", "Удалим пустой эпик", Status.NEW);
         Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null);
@@ -170,6 +173,8 @@ public class Main {
         } else {
             System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic3.getId()).getStatus() + "), должен быть DONE");
         }
+        SubTask subTask3 = new SubTask("Добавим в эпик, чтоб не грустил","Щас в тесты сохраню предзаолненный файл",Status.NEW,returnedEpic3.getId());
+        taskService.createSubTask(subTask3);
     }
 
 }

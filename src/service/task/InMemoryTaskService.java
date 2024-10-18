@@ -27,7 +27,7 @@ public class InMemoryTaskService implements TaskService {
     public Task createTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
-        return new Task(task);
+        return task.clone();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class InMemoryTaskService implements TaskService {
         epic.setSubTaskIds(new ArrayList<>());
         epic.setStatus(Status.NEW);
         epics.put(epic.getId(), epic);
-        return new Epic(epic);
+        return epic.clone();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class InMemoryTaskService implements TaskService {
         epic.addSubTaskId(subTask.getId());
         subTasks.put(subTask.getId(), subTask);
         recalculateEpicStatus(epic.getId());
-        return new SubTask(subTask);
+        return subTask.clone();
     }
 
     @Override
@@ -62,19 +62,19 @@ public class InMemoryTaskService implements TaskService {
         saved.setStatus(task.getStatus());
         saved.setTitle(task.getTitle());
         tasks.put(saved.getId(), saved);
-        return saved;
+        return saved.clone();
     }
 
     @Override
     public Epic updateEpic(Epic epic) {
         Epic saved = getEpic(epic.getId());
         if (Objects.isNull(saved)) {
-            return saved;
+            return null;
         }
         saved.setTitle(epic.getTitle());
         saved.setDescription(epic.getDescription());
         epics.put(saved.getId(), saved);
-        return saved;
+        return saved.clone();
     }
 
     @Override
@@ -106,31 +106,31 @@ public class InMemoryTaskService implements TaskService {
             subTasks.put(saved.getId(), saved);
             recalculateEpicStatus(saved.getEpicId());
         }
-        return saved;
+        return saved.clone();
     }
 
     @Override
     public Task getTask(int id) {
         Task immutableTask = tasks.get(id);
         if (Objects.isNull(immutableTask)) return null;
-        historyService.add(new Task(immutableTask));
-        return new Task(immutableTask);
+        historyService.add(immutableTask.clone());
+        return new Task(immutableTask.clone());
     }
 
     @Override
     public SubTask getSubTask(int id) {
         SubTask immutableSubTask = subTasks.get(id);
         if (Objects.isNull(immutableSubTask)) return null;
-        historyService.add(new SubTask(immutableSubTask));
-        return new SubTask(immutableSubTask);
+        historyService.add(immutableSubTask.clone());
+        return new SubTask(immutableSubTask.clone());
     }
 
     @Override
     public Epic getEpic(int id) {
         Epic immutableEpic = epics.get(id);
         if (Objects.isNull(immutableEpic)) return null;
-        historyService.add(new Epic(immutableEpic));
-        return new Epic(immutableEpic);
+        historyService.add(immutableEpic.clone());
+        return new Epic(immutableEpic.clone());
     }
 
     @Override

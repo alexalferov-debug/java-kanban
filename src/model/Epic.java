@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Epic extends Task {
+public class Epic extends Task implements Cloneable, Serializable {
     private List<Integer> subTaskIds = new ArrayList<>();
 
     public Epic(Epic epic) {
@@ -40,5 +41,11 @@ public class Epic extends Task {
                 "status: " + super.getStatus() + ";\n" +
                 "subTaskIds: " + subTaskIds +
                 "\n}";
+    }
+
+    @Override
+    public Epic clone() {
+        Epic clone = (Epic) super.clone();
+        return clone;
     }
 }

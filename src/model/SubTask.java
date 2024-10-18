@@ -1,6 +1,8 @@
 package model;
 
-public class SubTask extends Task {
+import java.io.Serializable;
+
+public class SubTask extends Task implements Cloneable, Serializable {
     int epicId;
 
     public SubTask(SubTask subTask) {
@@ -30,5 +32,12 @@ public class SubTask extends Task {
                 "status: " + super.getStatus() + ";\n" +
                 "epic.id: " + epicId +
                 "\n}";
+    }
+
+    @Override
+    public SubTask clone() {
+        SubTask clone = (SubTask) super.clone();
+        // TODO: copy mutable state here, so the clone can't change the internals of the original
+        return clone;
     }
 }

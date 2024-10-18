@@ -28,6 +28,11 @@ class FileBackedTaskServiceTest {
         try {
             ClassLoader loader = FileBackedTaskServiceTest.class.getClassLoader();
             file = new File(loader.getResource("myTasks.csv").getFile());
+            if (!file.exists()) {
+                System.out.println("Файл не найден: " + file.getAbsolutePath());
+            } else {
+                System.out.println("Файл найден: " + file.getAbsolutePath());
+            }
         } catch (Exception e) {
             System.out.println("Самсинг вент вронг" + e.getMessage());
         }

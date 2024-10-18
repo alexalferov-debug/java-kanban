@@ -10,7 +10,6 @@ import service.Managers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -26,13 +25,18 @@ class FileBackedTaskServiceTest {
 
     @BeforeAll
     public static void setup() {
-        ClassLoader loader = FileBackedTaskServiceTest.class.getClassLoader();
-        URL resourceUrl = loader.getResource("myTasks.csv");
-        if (resourceUrl == null) {
-            throw new IllegalArgumentException("Ресурс myTasks.csv не найден.");
+        try {
+            ClassLoader loader = FileBackedTaskServiceTest.class.getClassLoader();
+            System.out.println(loader);
+            file = new File(loader.getResource("myTasks.csv").getFile());
+            if (!file.exists()) {
+                System.out.println("Файл не найден: " + file.getAbsolutePath());
+            } else {
+                System.out.println("Файл найден: " + file.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            System.out.println("Самсинг вент вронг" + e.getMessage());
         }
-        file = new File(resourceUrl.getFile());
-        System.out.println("Файл найден: " + file.getAbsolutePath());
     }
 
     @AfterEach

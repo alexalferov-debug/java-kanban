@@ -8,8 +8,8 @@ import model.Task;
 import org.junit.jupiter.api.*;
 import service.Managers;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -25,18 +25,46 @@ class FileBackedTaskServiceTest {
 
     @BeforeAll
     public static void setup() {
-        try {
-            ClassLoader loader = FileBackedTaskServiceTest.class.getClassLoader();
-            System.out.println(loader);
-            file = new File(loader.getResource("myTasks.csv").getFile());
-            if (!file.exists()) {
-                System.out.println("Файл не найден: " + file.getAbsolutePath());
-            } else {
-                System.out.println("Файл найден: " + file.getAbsolutePath());
-            }
-        } catch (Exception e) {
-            System.out.println("Самсинг вент вронг" + e.getMessage());
+        URL resourceUrl = FileBackedTaskServiceTest.class.getClassLoader().getResource("myTasks.csv");
+        if (resourceUrl == null) {
+            throw new IllegalArgumentException("Ресурс не найден: myTasks.csv");
         }
+
+        File tempFile = null;
+
+        try {
+            // Создаем временный файл
+            tempFile = File.createTempFile("temp_", ".csv");
+            tempFile.deleteOnExit(); // Удаление файла при завершении программы
+
+            // Копируем содержимое из InputStream в временный файл
+            try (InputStream inputStream = resourceUrl.openStream();
+                 OutputStream outputStream = new FileOutputStream(tempFile)) {
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Ошибка ввода-вывода: " + e.getMessage());
+            e.printStackTrace(); // Печать стека вызовов для отладки
+            // Можно также выбросить своё собственное исключение, если требуется
+        } catch (SecurityException e) {
+            System.err.println("Недостаточно прав для создания файла: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Произошла неизвестная ошибка: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Если tempFile по-прежнему null, это указывает на ошибку
+        if (tempFile == null) {
+            throw new RuntimeException("Не удалось создать временный файл.");
+        }
+        file = tempFile;
     }
 
     @AfterEach

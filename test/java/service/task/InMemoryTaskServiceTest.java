@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.history.InMemoryHistoryService;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -126,8 +128,8 @@ class InMemoryTaskServiceTest {
     @Test
     public void shouldSeEpictStatusToInWorkWhenAddedSubTasksInDifferentStatuses() {
         Epic returnedEpic = service.createEpic(epic);
-        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId());
-        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId(), LocalDateTime.now().plusMinutes(90),30);
         SubTask returnedSubtask = service.createSubTask(subTask);
         SubTask returnedSubtask1 = service.createSubTask(subTask1);
         Assertions.assertEquals(Status.IN_WORK,service.getEpic(returnedEpic.getId()).getStatus(), "Статус эпика IN_WORK");
@@ -136,8 +138,8 @@ class InMemoryTaskServiceTest {
     @Test
     public void shouldRecalcEpicStatusAfterUpdateTasks() {
         Epic returnedEpic = service.createEpic(epic);
-        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId());
-        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId(),LocalDateTime.now().plusMinutes(83),70);
         SubTask returnedSubtask = service.createSubTask(subTask);
         SubTask returnedSubtask1 = service.createSubTask(subTask1);
         returnedSubtask1.setStatus(Status.NEW);
@@ -148,7 +150,7 @@ class InMemoryTaskServiceTest {
     @Test
     public void shouldRecalcEpicStatusAfterDropTasks() {
         Epic returnedEpic = service.createEpic(epic);
-        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId());
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
         SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
         SubTask returnedSubtask = service.createSubTask(subTask);
         SubTask returnedSubtask1 = service.createSubTask(subTask1);
@@ -157,20 +159,11 @@ class InMemoryTaskServiceTest {
     }
 
     @Test
-    public void shouldNotAllowAddingItselfAsEpicId() {
-        Epic returnedEpic = service.createEpic(epic);
-        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId());
-        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, subTask.getId());
-        SubTask returnedSubtask1 = service.createSubTask(subTask1);
-        Assertions.assertEquals(0,service.getSubTaskList().size(), "Сабтаск не добавлен в список, если идентификатор его эпика некорректный");
-    }
-
-    @Test
     public void shouldReturnNullOnCreateSubTuskIfEpicIdIsNotValid() {
         Epic returnedEpic = service.createEpic(epic);
         SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, 123123);
-        SubTask returnedSubtask = service.createSubTask(subTask1);
-        Assertions.assertNull(returnedSubtask, "Статус эпика NEW");
+        //SubTask returnedSubtask = service.createSubTask(subTask1);
+        Assertions.assertThrows(NotFoundException.class,() -> service.createSubTask(subTask1), "Добавление подзадачи к несуществующему эпику приводит к исключению");
     }
 
     @Test
@@ -282,4 +275,74 @@ class InMemoryTaskServiceTest {
         Assertions.assertEquals(returnedTask.getDescription(), service.getHistory().get(0).getDescription());
         Assertions.assertNotEquals(returnedTask.getStatus(), service.getHistory().get(0).getStatus());
     }
+
+    @Test
+    public void isCorrectEndTimeForTask(){
+        Task createdTask = new Task("Таск для добавления", "Просто добавим его в разные списки", Status.NEW, LocalDateTime.now().plusMinutes(50),30);
+        Task returnedTask = service.createTask(createdTask);
+        Assertions.assertEquals(createdTask.getStartTime().plusMinutes(createdTask.getDurationInMinutes()),returnedTask.getEndTime(),"Дата завершения таска рассчитана корректно");
+    }
+
+
+    @Test
+    public void ifDurationLessThanZeroItsReplacedOnDefaultValue(){
+        Task createdTask = new Task("Таск для добавления", "Просто добавим его в разные списки", Status.NEW, LocalDateTime.now().plusMinutes(50),-5);
+        Task returnedTask = service.createTask(createdTask);
+        Assertions.assertEquals(createdTask.getStartTime().plusMinutes(15),returnedTask.getEndTime(),"Дата завершения таска рассчитана корректно");
+    }
+
+    @Test
+    public void checkEpicStartDate(){
+        Epic returnedEpic = service.createEpic(epic);
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        service.createSubTask(subTask);
+        service.createSubTask(subTask1);
+        Assertions.assertEquals(subTask1.getStartTime(),service.getEpic(returnedEpic.getId()).getStartTime());
+    }
+
+    @Test
+    public void checkEpicEndDate(){
+        Epic returnedEpic = service.createEpic(epic);
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        service.createSubTask(subTask);
+        service.createSubTask(subTask1);
+        Assertions.assertEquals(subTask.getEndTime(),service.getEpic(returnedEpic.getId()).getEndTime());
+    }
+
+    @Test
+    public void checkEpicDuration(){
+        Epic returnedEpic = service.createEpic(epic);
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        service.createSubTask(subTask);
+        service.createSubTask(subTask1);
+        Assertions.assertEquals(Duration.between(subTask1.getStartTime(), subTask.getEndTime()).toMinutes(),service.getEpic(returnedEpic.getId()).getDurationInMinutes());
+    }
+
+    @Test
+    public void checkEpicDurationAfterDropTSubTask(){
+        Epic returnedEpic = service.createEpic(epic);
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        service.createSubTask(subTask);
+        SubTask returnedSubtask = service.createSubTask(subTask1);
+        service.dropSubTask(returnedSubtask.getId());
+        Assertions.assertEquals(Duration.between(subTask.getStartTime(), subTask.getEndTime()).toMinutes(),service.getEpic(returnedEpic.getId()).getDurationInMinutes());
+    }
+
+    @Test
+    public void checkThatPrioritizedTaskListReturnAllAddedTasks(){
+        Epic returnedEpic = service.createEpic(epic);
+        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
+        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
+        service.createSubTask(subTask);
+        SubTask returnedSubtask = service.createSubTask(subTask1);
+        task.setStartTime(LocalDateTime.now().plusMinutes(180));
+        task.setDurationInMinutes(80);
+        service.createTask(task);
+        Assertions.assertEquals(3,service.getPrioritizedTasks().size());
+    }
+
 }

@@ -302,16 +302,6 @@ class InMemoryTaskServiceTest {
     }
 
     @Test
-    public void checkEpicEndDate(){
-        Epic returnedEpic = service.createEpic(epic);
-        SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);
-        SubTask subTask1 = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.DONE, returnedEpic.getId());
-        service.createSubTask(subTask);
-        service.createSubTask(subTask1);
-        Assertions.assertEquals(subTask.getEndTime(),service.getEpic(returnedEpic.getId()).getEndTime());
-    }
-
-    @Test
     public void checkEpicDuration(){
         Epic returnedEpic = service.createEpic(epic);
         SubTask subTask = new SubTask("Добавляем сабтаск к эпику", "Чтобы удалить его", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(50),30);

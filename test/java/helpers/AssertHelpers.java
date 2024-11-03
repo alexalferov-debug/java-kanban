@@ -14,7 +14,7 @@ public class AssertHelpers{
         Assertions.assertEquals(expected.getStatus(),actual.getStatus(),"Статусы совпадают");
         Assertions.assertEquals(expected.getStartTime(),actual.getStartTime(),"Время начала совпадает");
         Assertions.assertEquals(expected.getEndTime(),actual.getEndTime(),"Время окончания совпадает");
-        Assertions.assertEquals(expected.getDurationInMinutes(),expected.getDurationInMinutes(),"Продолжительность совпадает");
+        Assertions.assertEquals(expected.getDurationInMinutes(),actual.getDurationInMinutes(),"Продолжительность совпадает");
     }
 
     public static void equalsForEpics(Epic expected,Epic actual){

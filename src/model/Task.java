@@ -12,7 +12,7 @@ public class Task implements Cloneable, Serializable {
     private LocalDateTime endTime;
     private int durationInMinutes;
     private Status status;
-    private final int DEFAULT_DURATION = 15;
+    private static final int defaultDuration = 15;
 
     public Task(Task task) {
         id = task.id;
@@ -20,7 +20,7 @@ public class Task implements Cloneable, Serializable {
         title = task.title;
         status = returnStatus(task.status);
         this.startTime = Objects.isNull(task.startTime) ? LocalDateTime.now() : task.startTime;
-        this.durationInMinutes = (task.durationInMinutes <= 0) ? DEFAULT_DURATION : task.durationInMinutes;
+        this.durationInMinutes = (task.durationInMinutes <= 0) ? defaultDuration : task.durationInMinutes;
         this.endTime = returnEndTime(startTime, this.durationInMinutes);
         this.endTime = returnEndTime(this.startTime, this.durationInMinutes);
     }
@@ -29,7 +29,7 @@ public class Task implements Cloneable, Serializable {
         this.title = title;
         this.description = description;
         this.startTime = LocalDateTime.now();
-        this.durationInMinutes = DEFAULT_DURATION;
+        this.durationInMinutes = defaultDuration;
         this.endTime = returnEndTime(startTime, this.durationInMinutes);
         this.status = returnStatus(status);
     }
@@ -38,7 +38,7 @@ public class Task implements Cloneable, Serializable {
         this.title = title;
         this.description = description;
         this.startTime = Objects.isNull(startTime) ? LocalDateTime.now() : startTime;
-        this.durationInMinutes = (durationInMinutes <= 0) ? DEFAULT_DURATION : durationInMinutes;
+        this.durationInMinutes = (durationInMinutes <= 0) ? defaultDuration : durationInMinutes;
         this.endTime = returnEndTime(startTime, this.durationInMinutes);
         this.status = returnStatus(status);
     }

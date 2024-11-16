@@ -1,29 +1,46 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task implements Cloneable,Serializable {
+public class Task implements Cloneable, Serializable {
     private int id;
     private String title;
     private String description;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private int durationInMinutes;
     private Status status;
+    private static final int defaultDuration = 15;
 
     public Task(Task task) {
         id = task.id;
         description = task.description;
         title = task.title;
-        status = task.status;
+        status = returnStatus(task.status);
+        this.startTime = Objects.isNull(task.startTime) ? LocalDateTime.now() : task.startTime;
+        this.durationInMinutes = (task.durationInMinutes <= 0) ? defaultDuration : task.durationInMinutes;
+        this.endTime = returnEndTime(startTime, this.durationInMinutes);
+        this.endTime = returnEndTime(this.startTime, this.durationInMinutes);
     }
 
     public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
-        if (Objects.isNull(status)) {
-            this.status = Status.NEW;
-        } else {
-            this.status = status;
-        }
+        this.startTime = LocalDateTime.now();
+        this.durationInMinutes = defaultDuration;
+        this.endTime = returnEndTime(startTime, this.durationInMinutes);
+        this.status = returnStatus(status);
+    }
+
+    public Task(String title, String description, Status status, LocalDateTime startTime, int durationInMinutes) {
+        this.title = title;
+        this.description = description;
+        this.startTime = Objects.isNull(startTime) ? LocalDateTime.now() : startTime;
+        this.durationInMinutes = (durationInMinutes <= 0) ? defaultDuration : durationInMinutes;
+        this.endTime = returnEndTime(startTime, this.durationInMinutes);
+        this.status = returnStatus(status);
     }
 
     @Override
@@ -44,6 +61,9 @@ public class Task implements Cloneable,Serializable {
                 "id:" + id + ";\n" +
                 "title: " + title + ";\n" +
                 "description: " + description + ";\n" +
+                "startTime: " + startTime + ";\n" +
+                "endTime: " + endTime + ";\n" +
+                "duration: " + durationInMinutes + ";\n" +
                 "status: " + status +
                 "\n}";
     }
@@ -62,6 +82,31 @@ public class Task implements Cloneable,Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getDurationInMinutes() {
+        return durationInMinutes;
+    }
+
+    public void setDurationInMinutes(int durationInMinutes) {
+        this.durationInMinutes = durationInMinutes;
+
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public String getDescription() {
@@ -88,5 +133,13 @@ public class Task implements Cloneable,Serializable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    private LocalDateTime returnEndTime(LocalDateTime startTime, int durationInMinutes) {
+        return startTime.plusMinutes(durationInMinutes);
+    }
+
+    private Status returnStatus(Status status) {
+        return Objects.isNull(status) ? Status.NEW : status;
     }
 }

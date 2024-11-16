@@ -25,6 +25,8 @@ public interface TaskService {
 
     List<SubTask> getSubTaskList();
 
+    List<Task> getPrioritizedTasks();
+
     List<Epic> getEpicList();
 
     List<Task> getTaskList();

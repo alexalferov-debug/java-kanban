@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class SubTask extends Task implements Cloneable, Serializable {
     int epicId;
@@ -12,6 +13,11 @@ public class SubTask extends Task implements Cloneable, Serializable {
 
     public SubTask(String title, String description, Status status, int epicId) {
         super(title, description, status);
+        this.epicId = epicId;
+    }
+
+    public SubTask(String title, String description, Status status, int epicId, LocalDateTime startTime, int durationInMinutes) {
+        super(title, description, status, startTime, durationInMinutes);
         this.epicId = epicId;
     }
 
@@ -29,6 +35,9 @@ public class SubTask extends Task implements Cloneable, Serializable {
                 "id:" + super.getId() + ";\n" +
                 "title: " + super.getTitle() + ";\n" +
                 "description: " + super.getDescription() + ";\n" +
+                "startTime: " + super.getStartTime() + ";\n" +
+                "endTime: " + super.getEndTime() + ";\n" +
+                "duration: " + super.getDurationInMinutes() + ";\n" +
                 "status: " + super.getStatus() + ";\n" +
                 "epic.id: " + epicId +
                 "\n}";

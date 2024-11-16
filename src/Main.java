@@ -7,18 +7,21 @@ import service.task.TaskService;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args) {
+        Random random = new Random();
         Path path = Paths.get(System.getProperty("user.home"), "tasks", "myTasks.csv");
         TaskService taskService = Managers.getFileService(path,false);
         Epic epic = new Epic("Тестовый эпик 1", "Добавим в него много задач, потом удалим эпик", Status.DONE);
         Epic epic1 = new Epic("Тестовый эпик 2", "Удалим пустой эпик", Status.NEW);
-        Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null);
-        Task task2 = new Task("второй таск для тестов", "сразу закроем, потом переоткроем", Status.DONE);
+        Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null, LocalDateTime.now().plusMinutes(random.nextInt(0,10)),random.nextInt(0,15));
+        Task task2 = new Task("второй таск для тестов", "сразу закроем, потом переоткроем", Status.DONE, LocalDateTime.now().plusMinutes(random.nextInt(26,36)),random.nextInt(0,20));
 
         if (taskService.dropSubTask(0)) {
             System.out.println("Если ты это видишь, удаление сабтасков работает неправильно");
@@ -54,8 +57,9 @@ public class Main {
             System.out.println(returnedTask);
         }
 
-        Epic returnedEpic;
-        SubTask subTask = new SubTask("подтаска для первого эпика", "закрываем", Status.DONE, 1);
+
+        Epic returnedEpic = taskService.createEpic(epic);
+        SubTask subTask = new SubTask("подтаска для первого эпика", "закрываем", Status.DONE, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(57,68)),random.nextInt(0,6));
 
         System.out.println("Создаём сабтаск");
         SubTask returnedSubTask = taskService.createSubTask(subTask);
@@ -65,13 +69,12 @@ public class Main {
 
 
         System.out.println("Создаём эпик и добавляем в него подтаск: ");
-        returnedEpic = taskService.createEpic(epic);
-        subTask = new SubTask("подтаска для первого эпика", "закрываем", Status.DONE, returnedEpic.getId());
-        SubTask subTask1 = new SubTask("другая подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId());
-        SubTask subTask2 = new SubTask("ещё подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId());
-        SubTask subTask4 = new SubTask("и ещё подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId());
-        SubTask subTask5 = new SubTask("очень много их подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId());
-        SubTask subTask7 = new SubTask("и все в первом эпике подтаска для первого эпика", "закрываем", Status.IN_WORK, returnedEpic.getId());
+        subTask = new SubTask("подтаска для первого эпика", "закрываем", Status.DONE, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(74,80)),random.nextInt(0,20));
+        SubTask subTask1 = new SubTask("другая подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(100,120)),random.nextInt(0,30));
+        SubTask subTask2 = new SubTask("ещё подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(150,180)),random.nextInt(0,90));
+        SubTask subTask4 = new SubTask("и ещё подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(0,50)),random.nextInt(0,90));
+        SubTask subTask5 = new SubTask("очень много их подтаска для первого эпика", "закрываем", Status.NEW, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(0,50)),random.nextInt(0,90));
+        SubTask subTask7 = new SubTask("и все в первом эпике подтаска для первого эпика", "закрываем", Status.IN_WORK, returnedEpic.getId(), LocalDateTime.now().plusMinutes(random.nextInt(0,50)),random.nextInt(0,90));
         SubTask subTask9 = new SubTask("да, и эта тоже подтаска для первого эпика", "закрываем", Status.DONE, returnedEpic.getId());
 
         System.out.println("Эпик создан, изначальный статус = NEW: " + returnedEpic);
@@ -93,7 +96,7 @@ public class Main {
         if (taskService.getEpic(returnedEpic.getId()).getStatus().equals(Status.NEW)) {
             System.out.println("В эпике обновлен сабтаск, статус изменен на new: " + returnedEpic);
         } else {
-            System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть DONE");
+            System.out.println("Статус эпика некорректный(" + taskService.getEpic(returnedEpic.getId()).getStatus() + "), должен быть NEW");
         }
         List<Task> getAnotherHistory = taskService.getHistory();
 

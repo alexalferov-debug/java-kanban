@@ -11,6 +11,7 @@ import service.Managers;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 
 class FileBackedTaskServiceTest {
@@ -19,8 +20,8 @@ class FileBackedTaskServiceTest {
     static File emptyFile;
     Epic epic1 = new Epic("Тестовый эпик 2", "Не будем удалять пустой эпик, поиграемся со статусами", Status.NEW);
     SubTask subTask3 = new SubTask("Добавим в эпик, чтоб не грустил", "Щас в тесты сохраню предзаолненный файл", Status.NEW, 5);
-    Task task2 = new Task("второй таск для тестов", "сразу закроем, потом переоткроем", Status.DONE);
-    Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null);
+    Task task2 = new Task("второй таск для тестов", "сразу закроем, потом переоткроем", Status.DONE, LocalDateTime.now().plusMinutes(40),50);
+    Task task = new Task("Таск для тестов", "Описание таска, таск без статуса", null,LocalDateTime.now(),30);
 
     @AfterEach
     public void tearDownWriteTests() {

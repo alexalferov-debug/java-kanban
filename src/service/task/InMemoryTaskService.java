@@ -107,7 +107,7 @@ public class InMemoryTaskService implements TaskService {
         if (Objects.isNull(epic)) {
             throw new NotFoundException("Невозможно привязать сабтаск к несуществующему эпику с id = " + subTask.getEpicId());
         }
-        if (doIntervalsOverlap(subTask)){
+        if (doIntervalsOverlap(subTask)) {
             throw new ValidationException("На временной интервал с " + subTask.getStartTime() + " до " + subTask.getStartTime().plusMinutes(subTask.getDurationInMinutes()) + "уже создана задача");
         }
         saved.setDescription(subTask.getDescription());

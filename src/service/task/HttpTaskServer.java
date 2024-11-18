@@ -1,11 +1,12 @@
 package service.task;
 
 import com.sun.net.httpserver.HttpServer;
-import static model.Endpoint.*;
 import service.task.handlers.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+
+import static model.Endpoint.*;
 
 public class HttpTaskServer {
     HttpServer httpServer = HttpServer.create();

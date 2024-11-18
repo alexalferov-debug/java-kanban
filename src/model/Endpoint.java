@@ -8,7 +8,7 @@ public enum Endpoint {
     PRIORITIZED("/prioritized");
 
 
-    Endpoint(String endpoint){
+    Endpoint(String endpoint) {
         this.endpoint = endpoint;
     }
 
@@ -18,7 +18,7 @@ public enum Endpoint {
         return endpoint;
     }
 
-    public String getModifiedEndpoint(String addPart){
-        return this.endpoint+addPart;
+    public String getModifiedEndpoint(String addPart) {
+        return this.endpoint + addPart;
     }
 }

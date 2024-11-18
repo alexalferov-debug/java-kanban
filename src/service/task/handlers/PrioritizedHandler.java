@@ -8,7 +8,7 @@ import service.task.TaskService;
 import java.io.IOException;
 
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
-    public PrioritizedHandler(TaskService taskService){
+    public PrioritizedHandler(TaskService taskService) {
         this.taskService = taskService;
     }
 
@@ -23,7 +23,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     public void getPrioritizedTasks(HttpExchange exchange) throws IOException {
-        sendText(exchange,gson.toJson(taskService.getPrioritizedTasks()),200);
+        sendText(exchange, gson.toJson(taskService.getPrioritizedTasks()), 200);
     }
 
 }

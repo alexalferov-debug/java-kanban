@@ -8,7 +8,7 @@ import service.task.TaskService;
 import java.io.IOException;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
-    public HistoryHandler(TaskService taskService){
+    public HistoryHandler(TaskService taskService) {
         this.taskService = taskService;
     }
 
@@ -23,7 +23,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     public void getHistory(HttpExchange exchange) throws IOException {
-        sendText(exchange,gson.toJson(taskService.getHistory()),200);
+        sendText(exchange, gson.toJson(taskService.getHistory()), 200);
     }
 
 }

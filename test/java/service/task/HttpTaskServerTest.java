@@ -129,7 +129,7 @@ public class HttpTaskServerTest {
                             Assertions.assertEquals(subTask.getStartTime(), taskFromResponse.getStartTime(), "Время начала совпадает");
                             Assertions.assertEquals(subTask.getEndTime(), taskFromResponse.getEndTime(), "Время окончания совпадает");
                             Assertions.assertEquals(subTask.getDurationInMinutes(), taskFromResponse.getDurationInMinutes(), "Продолжительность совпадает");
-                            AssertHelpers.equalsForEpics(epic1, taskFromResponse.getEpic());
+                            AssertHelpers.equalsForEpics(taskService.getEpic(subTask.getEpicId()), taskFromResponse.getEpic());
                         }),
                 DynamicTest.dynamicTest("После добавления таска видим его в сервисе",
                         () -> AssertHelpers.equalsForSubTasks(task, taskService.getSubTask(2)))

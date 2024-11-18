@@ -27,8 +27,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String[] uriParts = exchange.getRequestURI().getPath().split("/");
         switch (method) {
-            case "GET": {
-                {
+            case "GET": {{
                     if (uriParts.length > 3 && uriParts[3].equals("subtasks")) {
                         try {
                             Epic epic = taskService.getEpic(Integer.parseInt(uriParts[2]));
@@ -40,8 +39,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
                         getEpic(exchange);
                     }
                     break;
-                }
-            }
+                }}
             case "POST": {
                 addEpic(exchange);
                 break;

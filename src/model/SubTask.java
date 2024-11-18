@@ -45,6 +45,9 @@ public class SubTask extends Task implements Cloneable, Serializable {
 
     @Override
     public SubTask clone() {
-        return (SubTask) super.clone();
+        SubTask subTask = (SubTask) super.clone();
+        subTask.setStartTime(this.getStartTime());
+        subTask.setEndTime(this.getEndTime());
+        return subTask;
     }
 }

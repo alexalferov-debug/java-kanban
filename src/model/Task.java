@@ -140,7 +140,10 @@ public class Task implements Cloneable, Serializable {
     @Override
     public Task clone() {
         try {
-            return (Task) super.clone();
+            Task task =  (Task) super.clone();
+            task.setStartTime(this.startTime);
+            task.setEndTime(this.endTime);
+            return task;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

@@ -1,14 +1,20 @@
 package model;
 
+import com.google.gson.annotations.JsonAdapter;
+import model.adapters.LocalDateTimeAdapter;
+import service.task.exceptions.ValidationException;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task implements Cloneable, Serializable {
-    private int id;
+    private Integer id;
     private String title;
     private String description;
+    @JsonAdapter(LocalDateTimeAdapter.class)
     private LocalDateTime startTime;
+    @JsonAdapter(LocalDateTimeAdapter.class)
     private LocalDateTime endTime;
     private int durationInMinutes;
     private Status status;
@@ -55,6 +61,12 @@ public class Task implements Cloneable, Serializable {
         return (id == task.id);
     }
 
+    public void check() {
+        if (Objects.isNull(title) || title.isEmpty() || Objects.isNull(description) || description.isEmpty()) {
+            throw new ValidationException("Не удалось распарсить объект из переданного запроса");
+        }
+    }
+
     @Override
     public String toString() {
         return "Task{\n" +
@@ -68,7 +80,7 @@ public class Task implements Cloneable, Serializable {
                 "\n}";
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

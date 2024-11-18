@@ -1,4 +1,4 @@
-package service.task;
+package service.task.exceptions;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message, Exception e) {

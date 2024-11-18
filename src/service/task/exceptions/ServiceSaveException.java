@@ -1,4 +1,4 @@
-package service.task;
+package service.task.exceptions;
 
 public class ServiceSaveException extends RuntimeException {
     public ServiceSaveException(String message, Exception e) {

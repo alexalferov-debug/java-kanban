@@ -5,6 +5,8 @@ import model.Status;
 import model.SubTask;
 import model.Task;
 import service.history.HistoryService;
+import service.task.exceptions.NotFoundException;
+import service.task.exceptions.ValidationException;
 
 import java.time.Duration;
 import java.util.*;
@@ -27,13 +29,14 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public Task createTask(Task task) {
-        task.setId(generateId());
         if (doIntervalsOverlap(task)) {
-            throw new ValidationException("На временной интервал с " + task.getStartTime() + " до " + task.getEndTime() + "уже создана задача");
+            throw new ValidationException("На временной интервал с " + task.getStartTime() + " до " + task.getStartTime().plusMinutes(task.getDurationInMinutes()) + "уже создана задача");
         }
-        tasks.put(task.getId(), task);
-        prioritizedTasks.add(task);
-        return task.clone();
+        task.setId(generateId());
+        Task task1 = new Task(task);
+        tasks.put(task.getId(), task1);
+        prioritizedTasks.add(task1);
+        return task1.clone();
     }
 
     @Override
@@ -41,8 +44,9 @@ public class InMemoryTaskService implements TaskService {
         epic.setId(generateId());
         epic.setSubTaskIds(new ArrayList<>());
         epic.setStatus(Status.NEW);
-        epics.put(epic.getId(), epic);
-        return epic.clone();
+        Epic epic1 = new Epic(epic);
+        epics.put(epic.getId(), epic1);
+        return epic1.clone();
     }
 
     @Override
@@ -52,14 +56,15 @@ public class InMemoryTaskService implements TaskService {
             throw new NotFoundException("Невозможно привязать сабтаск к несуществующему эпику с id = " + subTask.getEpicId());
         }
         if (doIntervalsOverlap(subTask)) {
-            throw new ValidationException("На временной интервал с " + subTask.getStartTime() + " до " + subTask.getEndTime() + "уже создана задача");
+            throw new ValidationException("На временной интервал с " + subTask.getStartTime() + " до " + subTask.getStartTime().plusMinutes(subTask.getDurationInMinutes()) + "уже создана задача");
         }
         subTask.setId(generateId());
-        epic.addSubTaskId(subTask.getId());
-        subTasks.put(subTask.getId(), subTask);
-        prioritizedTasks.add(subTask);
+        SubTask subTask1 = new SubTask(subTask);
+        epic.addSubTaskId(subTask1.getId());
+        subTasks.put(subTask.getId(), subTask1);
+        prioritizedTasks.add(subTask1);
         recalculateEpicFields(epic.getId());
-        return subTask.clone();
+        return subTask1.clone();
     }
 
     @Override
@@ -69,7 +74,7 @@ public class InMemoryTaskService implements TaskService {
             throw new NotFoundException("Не найден таск с id = " + task.getId());
         }
         if (doIntervalsOverlap(task)) {
-            throw new ValidationException("На временной интервал с " + task.getStartTime() + " до " + task.getEndTime() + "уже создана задача");
+            throw new ValidationException("На временной интервал с " + task.getStartTime() + " до " + task.getStartTime().plusMinutes(task.getDurationInMinutes()) + "уже создана задача");
         }
         saved.setDescription(task.getDescription());
         saved.setStatus(task.getStatus());
@@ -102,6 +107,9 @@ public class InMemoryTaskService implements TaskService {
         if (Objects.isNull(epic)) {
             throw new NotFoundException("Невозможно привязать сабтаск к несуществующему эпику с id = " + subTask.getEpicId());
         }
+        if (doIntervalsOverlap(subTask)){
+            throw new ValidationException("На временной интервал с " + subTask.getStartTime() + " до " + subTask.getStartTime().plusMinutes(subTask.getDurationInMinutes()) + "уже создана задача");
+        }
         saved.setDescription(subTask.getDescription());
         saved.setTitle(subTask.getTitle());
         if (saved.getStatus().equals(subTask.getStatus())) {
@@ -131,7 +139,9 @@ public class InMemoryTaskService implements TaskService {
     @Override
     public Task getTask(int id) {
         Task immutableTask = tasks.get(id);
-        if (Objects.isNull(immutableTask)) return null;
+        if (Objects.isNull(immutableTask)) {
+            throw new NotFoundException("Таск с id = " + id + " не найден");
+        }
         historyService.add(immutableTask.clone());
         return new Task(immutableTask.clone());
     }
@@ -139,7 +149,9 @@ public class InMemoryTaskService implements TaskService {
     @Override
     public SubTask getSubTask(int id) {
         SubTask immutableSubTask = subTasks.get(id);
-        if (Objects.isNull(immutableSubTask)) return null;
+        if (Objects.isNull(immutableSubTask)) {
+            throw new NotFoundException("Сабтаск с id = " + id + " не найден");
+        }
         historyService.add(immutableSubTask.clone());
         return new SubTask(immutableSubTask.clone());
     }
@@ -147,7 +159,9 @@ public class InMemoryTaskService implements TaskService {
     @Override
     public Epic getEpic(int id) {
         Epic immutableEpic = epics.get(id);
-        if (Objects.isNull(immutableEpic)) return null;
+        if (Objects.isNull(immutableEpic)) {
+            throw new NotFoundException("Эпик с id = " + id + " не найден");
+        }
         historyService.add(immutableEpic.clone());
         return new Epic(immutableEpic.clone());
     }
@@ -271,10 +285,10 @@ public class InMemoryTaskService implements TaskService {
 
     private boolean doIntervalsOverlap(Task task) {
         for (Task t : prioritizedTasks) {
-            if (t.getId() == task.getId()) {
+            if (Objects.equals(t.getId(), task.getId())) {
                 continue;
             }
-            if (t.getStartTime().isBefore(task.getEndTime()) && task.getStartTime().isBefore(t.getEndTime())) {
+            if (t.getStartTime().isBefore(task.getStartTime().plusMinutes(task.getDurationInMinutes())) && task.getStartTime().isBefore(t.getEndTime())) {
                 return true;
             }
         }

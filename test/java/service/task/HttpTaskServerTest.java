@@ -121,13 +121,14 @@ public class HttpTaskServerTest {
                         () -> Assertions.assertEquals(201, response.statusCode())),
                 DynamicTest.dynamicTest("Тело ответа содержит данные сабтаска + данные эпика",
                         () -> {
-                            Assertions.assertEquals(task.getId(), taskFromResponse.getId(), "Статусы совпадают");
-                            Assertions.assertEquals(task.getTitle(), taskFromResponse.getTitle(), "Заголовки совпадают");
-                            Assertions.assertEquals(task.getDescription(), taskFromResponse.getDescription(), "Описания совпадают");
-                            Assertions.assertEquals(task.getStatus(), taskFromResponse.getStatus(), "Статусы совпадают");
-                            Assertions.assertEquals(task.getStartTime(), taskFromResponse.getStartTime(), "Время начала совпадает");
-                            Assertions.assertEquals(task.getEndTime(), taskFromResponse.getEndTime(), "Время окончания совпадает");
-                            Assertions.assertEquals(task.getDurationInMinutes(), taskFromResponse.getDurationInMinutes(), "Продолжительность совпадает");
+                            SubTask subTask = taskService.getSubTask(2);
+                            Assertions.assertEquals(subTask.getId(), taskFromResponse.getId(), "Статусы совпадают");
+                            Assertions.assertEquals(subTask.getTitle(), taskFromResponse.getTitle(), "Заголовки совпадают");
+                            Assertions.assertEquals(subTask.getDescription(), taskFromResponse.getDescription(), "Описания совпадают");
+                            Assertions.assertEquals(subTask.getStatus(), taskFromResponse.getStatus(), "Статусы совпадают");
+                            Assertions.assertEquals(subTask.getStartTime(), taskFromResponse.getStartTime(), "Время начала совпадает");
+                            Assertions.assertEquals(subTask.getEndTime(), taskFromResponse.getEndTime(), "Время окончания совпадает");
+                            Assertions.assertEquals(subTask.getDurationInMinutes(), taskFromResponse.getDurationInMinutes(), "Продолжительность совпадает");
                             AssertHelpers.equalsForEpics(epic1, taskFromResponse.getEpic());
                         }),
                 DynamicTest.dynamicTest("После добавления таска видим его в сервисе",

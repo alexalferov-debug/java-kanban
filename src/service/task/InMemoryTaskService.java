@@ -80,7 +80,7 @@ public class InMemoryTaskService implements TaskService {
         saved.setStatus(task.getStatus());
         saved.setTitle(task.getTitle());
         tasks.put(saved.getId(), saved);
-        prioritizedTasks.removeIf(t -> t.getId() == saved.getId());
+        prioritizedTasks.removeIf(t -> Objects.equals(t.getId(), saved.getId()));
         prioritizedTasks.add(saved);
         return saved.clone();
     }
@@ -209,7 +209,7 @@ public class InMemoryTaskService implements TaskService {
             SubTask subTask = getSubTask(subTaskId);
             Epic epic = getEpic(subTask.getEpicId());
             epic.removeSubTask(subTask.getId());
-            prioritizedTasks.removeIf(task -> task.getId() == subTask.getId());
+            prioritizedTasks.removeIf(task -> Objects.equals(task.getId(), subTask.getId()));
             recalculateEpicFields(epic.getId());
             subTasks.remove(subTaskId);
             return true;

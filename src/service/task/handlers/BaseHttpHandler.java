@@ -3,9 +3,7 @@ package service.task.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import model.adapters.LocalDateTimeAdapter;
-import service.Managers;
 import service.task.TaskService;
 
 import java.io.IOException;

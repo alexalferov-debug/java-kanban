@@ -9,7 +9,6 @@ import java.net.InetSocketAddress;
 
 public class HttpTaskServer {
     HttpServer httpServer = HttpServer.create();
-    TaskService taskService;
 
 
     public HttpTaskServer(int port, TaskService taskService) throws IOException {

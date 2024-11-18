@@ -58,7 +58,7 @@ public class Task implements Cloneable, Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Task task)) return false;
-        return (id == task.id);
+        return (Objects.equals(id, task.id));
     }
 
     public void check() {
@@ -140,8 +140,7 @@ public class Task implements Cloneable, Serializable {
     @Override
     public Task clone() {
         try {
-            Task clone = (Task) super.clone();
-            return clone;
+            return (Task) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

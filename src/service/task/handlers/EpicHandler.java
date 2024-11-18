@@ -126,7 +126,6 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private List<EpicDto> epicsListToDto(List<Epic> epics) {
-        List<EpicDto> epicDtos = new ArrayList<>();
         if (epics.isEmpty()) {
             return Collections.emptyList();
         }

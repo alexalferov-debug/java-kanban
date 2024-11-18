@@ -5,7 +5,6 @@ import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.adapters.LocalDateTimeAdapter;
-import service.task.TaskService;
 import service.task.exceptions.ValidationException;
 
 import java.time.LocalDateTime;
@@ -22,10 +21,10 @@ public class SubTaskDTO {
     private Status status;
     Epic epic;
 
-    private SubTaskDTO(){
+    private SubTaskDTO() {
     }
 
-    public static SubTaskDTO returnSubTaskDto (SubTask subTask,Epic epic){
+    public static SubTaskDTO returnSubTaskDto(SubTask subTask, Epic epic) {
         if (subTask.getEpicId() == epic.getId()) {
             SubTaskDTO subTaskDTO = new SubTaskDTO();
             subTaskDTO.id = subTask.getId();

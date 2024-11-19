@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class SubTask extends Task implements Cloneable, Serializable {
-    Integer epicId;
+    private Integer epicId;
 
     public SubTask(SubTask subTask) {
         super(subTask);

@@ -1,7 +1,7 @@
 package model.dto;
 
 public class Message {
-    String message;
+    private String message;
 
     public Message(String message) {
         this.message = message;

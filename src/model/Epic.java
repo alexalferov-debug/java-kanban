@@ -46,6 +46,8 @@ public class Epic extends Task implements Cloneable, Serializable {
     @Override
     public Epic clone() {
         Epic clone = (Epic) super.clone();
+        clone.setStartTime(this.getStartTime());
+        clone.setEndTime(this.getEndTime());
         return clone;
     }
 }

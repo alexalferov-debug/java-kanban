@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class SubTask extends Task implements Cloneable, Serializable {
-    int epicId;
+    private Integer epicId;
 
     public SubTask(SubTask subTask) {
         super(subTask);
@@ -45,6 +45,9 @@ public class SubTask extends Task implements Cloneable, Serializable {
 
     @Override
     public SubTask clone() {
-        return (SubTask) super.clone();
+        SubTask subTask = (SubTask) super.clone();
+        subTask.setStartTime(this.getStartTime());
+        subTask.setEndTime(this.getEndTime());
+        return subTask;
     }
 }

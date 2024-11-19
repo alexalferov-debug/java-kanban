@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.history.InMemoryHistoryService;
+import service.task.exceptions.NotFoundException;
+import service.task.exceptions.ValidationException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

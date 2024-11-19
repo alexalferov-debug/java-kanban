@@ -1,14 +1,20 @@
 package model;
 
+import com.google.gson.annotations.JsonAdapter;
+import model.adapters.LocalDateTimeAdapter;
+import service.task.exceptions.ValidationException;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task implements Cloneable, Serializable {
-    private int id;
+    private Integer id;
     private String title;
     private String description;
+    @JsonAdapter(LocalDateTimeAdapter.class)
     private LocalDateTime startTime;
+    @JsonAdapter(LocalDateTimeAdapter.class)
     private LocalDateTime endTime;
     private int durationInMinutes;
     private Status status;
@@ -52,7 +58,13 @@ public class Task implements Cloneable, Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Task task)) return false;
-        return (id == task.id);
+        return (Objects.equals(id, task.id));
+    }
+
+    public void check() {
+        if (Objects.isNull(title) || title.isEmpty() || Objects.isNull(description) || description.isEmpty()) {
+            throw new ValidationException("Не удалось распарсить объект из переданного запроса");
+        }
     }
 
     @Override
@@ -68,7 +80,7 @@ public class Task implements Cloneable, Serializable {
                 "\n}";
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -128,8 +140,10 @@ public class Task implements Cloneable, Serializable {
     @Override
     public Task clone() {
         try {
-            Task clone = (Task) super.clone();
-            return clone;
+            Task task =  (Task) super.clone();
+            task.setStartTime(this.startTime);
+            task.setEndTime(this.endTime);
+            return task;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
